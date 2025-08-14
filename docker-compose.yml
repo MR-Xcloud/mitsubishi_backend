@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  mitsu-backend:
+    build: .
+    # image: vinay0981123/mitsu_backend:latest
+    container_name: mitsu-backend
+    restart: unless-stopped
+    environment:
+      - DJANGO_SETTINGS_MODULE=mitsu.settings
+    command: >
+      /bin/sh -c "python manage.py migrate --noinput &&
+                  python manage.py runserver 0.0.0.0:8798"
+    volumes:
+      - ./:/app                         # source code (useful for dev)
+      - ./db.sqlite3:/app/db.sqlite3    # requested DB mount
+      - ./staticfiles:/app/staticfiles  # persistent staticfiles (collectstatic output)
+    ports:
+      - "8798:8798"                     # host:container (host 8798 -> gunicorn 8000)
+    networks:
+      - mitsu-backend-network
+
+networks:
+  mitsu-backend-network:
+    driver: bridge

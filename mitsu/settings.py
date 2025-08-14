@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -118,11 +119,28 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
+# FORCE_SCRIPT_NAME = "/mitsu-backend"          optional if you still need the prefix
+
+# Static files
+STATIC_URL = "/mitsu-backend/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# WhiteNoise storage (you already added this)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# WhiteNoise compressed manifest storage (cache busting + compressed static files)
+# Requires whitenoise in your requirements.txt
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# whitenoise works with SECURE_PROXY_SSL_HEADER if behind a proxy; harmless here
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "HTTP")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000','https://staging.webmobrildemo.com']
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8798",
+    "http://localhost:3000",
+    "https://staging.webmobrildemo.com",
+]

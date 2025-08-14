@@ -1,0 +1,8 @@
+djangorestframework
+django-cors-headers
+django
+pillow
+gunicorn
+werkzeug
+whitenoise
+psycopg2-binary
