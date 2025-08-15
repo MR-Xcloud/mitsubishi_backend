@@ -25,17 +25,32 @@ def get_user(request):
 def get_user_initials(request):
     """
     Get all registered users' first name initials in an array
+    Only returns initials where at least one user with that initial hasn't won yet
     """
     users = Register.objects.all()
-    initials = []
+    initial_counts = {}
     
+    # Count total users for each initial
     for user in users:
         if user.full_name:
-            # Split the full name and get the first name initial
             first_name = user.full_name.split()[0] if user.full_name.strip() else ""
             if first_name:
                 initial = first_name[0].upper()
-                initials.append(initial)
+                if initial not in initial_counts:
+                    initial_counts[initial] = {'total': 0, 'winners': 0}
+                initial_counts[initial]['total'] += 1
+    
+    # Count winners for each initial
+    for winner in WinningList.objects.all():
+        initial = winner.initial
+        if initial in initial_counts:
+            initial_counts[initial]['winners'] += 1
+    
+    # Add initial to list only if there are still users who haven't won
+    initials = []
+    for initial, counts in initial_counts.items():
+        if counts['winners'] < counts['total']:
+            initials.append(initial)
     
     return Response({
         'initials': initials,
@@ -79,21 +94,11 @@ def select_winner_by_initial(request):
             'matching_users_count': 0
         }, status=status.HTTP_404_NOT_FOUND)
     
-    # Add all matching users to the winning list
-    # (All matching_users are already filtered to exclude previous winners)
-    winners_added = []
-    for user in matching_users:
-        winner_entry = WinningList.objects.create(user=user, initial=initial)
-        winners_added.append(winner_entry)
-    
     # Randomly select one winner from the matching users
     selected_winner = random.choice(matching_users)
     
-    # Get or create the winning entry for the selected winner
-    winner_entry, created = WinningList.objects.get_or_create(
-        user=selected_winner, 
-        initial=initial
-    )
+    # Create the winning entry for the selected winner only
+    winner_entry = WinningList.objects.create(user=selected_winner, initial=initial)
     
     # Get previous winners for this initial
     previous_winners = WinningList.objects.filter(initial=initial).exclude(user=selected_winner)
@@ -102,7 +107,7 @@ def select_winner_by_initial(request):
         'message': f'Winner selected for initial "{initial}"',
         'initial': initial,
         'matching_users_count': len(matching_users),
-        'winners_added_count': len(winners_added),
+        'winners_added_count': 1,
         'selected_winner': {
             'id': selected_winner.id,
             'full_name': selected_winner.full_name,
