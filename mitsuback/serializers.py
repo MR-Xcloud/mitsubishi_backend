@@ -13,7 +13,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 class WinningListSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.full_name', read_only=True)
     user_company_name = serializers.CharField(source='user.company_name', read_only=True)
+    user_phone_number = serializers.CharField(source='user.phone_number', read_only=True)
     
     class Meta:
         model = WinningList
-        fields = ['id', 'user', 'user_name', 'user_company_name', 'initial', 'won_at']
+        fields = ['id', 'user', 'user_name', 'user_company_name', 'user_phone_number', 'initial', 'won_at']

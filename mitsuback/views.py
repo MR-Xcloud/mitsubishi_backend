@@ -111,15 +111,17 @@ def select_winner_by_initial(request):
         'selected_winner': {
             'id': selected_winner.id,
             'full_name': selected_winner.full_name,
-            'email': selected_winner.email,
-            'employee_id': selected_winner.employee_id
+            # 'email': selected_winner.email,
+            'company_name': selected_winner.company_name,
+            'phone_number':selected_winner.phone_number
         },
         'all_matching_users': [
             {
                 'id': user.id,
                 'full_name': user.full_name,
-                'email': user.email,
-                'employee_id': user.employee_id
+                # 'email': user.email,
+                'company_name': user.company_name,
+                'phone_number':selected_winner.phone_number
             } for user in matching_users
         ],
         'previous_winners_count': previous_winners.count(),
@@ -127,8 +129,9 @@ def select_winner_by_initial(request):
             {
                 'id': winner.user.id,
                 'full_name': winner.user.full_name,
-                'email': winner.user.email,
-                'employee_id': winner.user.employee_id,
+                # 'email': winner.user.email,
+                'company_name': winner.user.company_name,
+                'phone_number':selected_winner.phone_number,
                 'won_at': winner.won_at
             } for winner in previous_winners
         ]
